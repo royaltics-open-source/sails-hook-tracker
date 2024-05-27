@@ -1,0 +1,7 @@
+{
+    "extends": "google",
+    "rules": {
+      "no-var":"off",
+      "comma-dangle":"off"
+    }
+}

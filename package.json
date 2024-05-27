@@ -1,0 +1,38 @@
+{
+  "name": "sails-hook-tracker",
+  "version": "1.0.0",
+  "description": "Sails hook Tracker for Sentry (Capture Errors)",
+  "main": "index.js",
+  "author": "Royaltics Solutions <",
+  "license": "ISC",
+  "homepage": "https://github.com/royaltics-open-source/sails-hook-tracker",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/royaltics-open-source/sails-hook-tracker.git"
+  },
+  "keywords": [
+    "capture",
+    "error",
+    "node",
+    "errors",
+    "debugging",
+    "exceptions",
+    "sails",
+    "hook"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+
+  "sails": {
+    "isHook": true
+  },
+  "dependencies": {
+    "cookie": "^0.6.0",
+    "json-stringify-safe": "^5.0.1",
+    "lsmod": "^1.0.0",
+    "stack-trace": "^0.0.9",
+    "uuid": "^3.0.0",
+    "zlib": "^1.0.5"
+  }
+}
