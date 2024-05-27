@@ -33,10 +33,9 @@ module.exports = function Tracker(sails) {
       }
 
       if (!settings.dsn) {
-        sails.log.error('DSN for Tracker is required.');
+        sails.log.error('DSN for Tracker is required in config/tracker.js module '+this.configKey);
         return cb();
       }
-
 
       var tracker = require("./src/client");
       tracker.config(settings.dsn, settings.options).install();

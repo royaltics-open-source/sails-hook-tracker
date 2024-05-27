@@ -14,17 +14,18 @@ function Tracker() {
 
     this.config = (dsn, options) => {
 
-        if (arguments.length === 0) {
-            options = {};
-            utils.consoleAlertOnce('Capture Exceptions requiere dsn');
 
-        }
-
-        //Review require navigator
-        if (typeof window !== 'undefined' && typeof document !== 'undefined' && typeof navigator !== 'undefined') {
+         //Review require navigator
+         if (typeof window !== 'undefined' && typeof document !== 'undefined' && typeof navigator !== 'undefined') {
             utils.consoleAlertOnce('This looks like a browser environment; are you sure you don\'t want Tracker.js for browser JavaScript? https://sentry.io/for/javascript');
         }
 
+
+        if (!dsn || !options) {
+            options = {};
+            utils.consoleAlertOnce('Tracker requiere file config/tracker.js module.exports.tracker{ dsn: string, options: {}} ');
+
+        }
 
 
         this.options = options || {};
