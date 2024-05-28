@@ -11,16 +11,16 @@ module.exports.disableConsoleAlerts = function disableConsoleAlerts() {
   consoleAlerts = false;
 };
 
-module.exports.consoleAlert = function consoleAlert(msg, data) {
+module.exports.consoleAlert = function consoleAlert(msg, data = '') {
   if (consoleAlerts) {
-    sails.log.error("sails-hooks-tracker@" + version + ': ' + msg, data);
+    sails.log.debug("sails-hooks-tracker@" + version + ': ' + msg, data);
   }
 };
 
 module.exports.consoleAlertOnce = function consoleAlertOnce(msg) {
   if (consoleAlerts && !(msg in consoleAlerts)) {
     consoleAlerts[msg] = true;
-    sails.log.error("sails-hooks-tracker@" + version + ': ' + msg);
+    sails.log.debug("sails-hooks-tracker@" + version + ': ' + msg);
   }
 };
 
@@ -53,10 +53,13 @@ module.exports.parseDSN = function parseDSN(dsn) {
     }
 
     const parsedUrl = new URL(dsn);
+    const portDefault = parsedUrl.protocol === 'https:' ? '443' : '80';
     return {
       hostname: parsedUrl.hostname,
       path: parsedUrl.pathname + parsedUrl.search,
-      port: parsedUrl.port
+      port: portDefault, //parsedUrl.port || 
+      protocol: parsedUrl.protocol,
+      protocolIndex: parsedUrl.protocol === 'http:' ? 0 : 1,
     };
   } catch (e) {
     throw new Error('Invalid tracker DSN: ' + dsn + " -> " + e?.message);

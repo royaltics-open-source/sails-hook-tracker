@@ -15,8 +15,8 @@ function Tracker() {
     this.config = (dsn, options) => {
 
 
-         //Review require navigator
-         if (typeof window !== 'undefined' && typeof document !== 'undefined' && typeof navigator !== 'undefined') {
+        //Review require navigator
+        if (typeof window !== 'undefined' && typeof document !== 'undefined' && typeof navigator !== 'undefined') {
             utils.consoleAlertOnce('This looks like a browser environment; are you sure you don\'t want Tracker.js for browser JavaScript? https://sentry.io/for/javascript');
         }
 
@@ -29,6 +29,7 @@ function Tracker() {
 
 
         this.options = options || {};
+        this.debug = options.debug || false;
         this.dsn = utils.parseDSN(dsn);
         this.name = options.name || require('os').hostname();
         this.root = options.root || process.cwd();
@@ -81,6 +82,10 @@ function Tracker() {
             if (this.autoBreadcrumbs.hasOwnProperty(key)) {
                 this.autoBreadcrumbs[key] && autoBreadcrumbs.instrument(key, this);
             }
+        }
+
+        if (this.debug) {
+            utils.consoleAlert('Instalado DSN: ' + this.dsn.hostname + this.dsn.path + " port: " + this.dsn.port + " protocol: " + this.dsn.protocol);
         }
 
         this.installed = true;
@@ -151,6 +156,9 @@ function Tracker() {
      */
     this.send = (eventCapture, cb) => {
         var seventCapture = stringify(eventCapture);
+        if (this.debug) {
+            utils.consoleAlert('Enviando: ', seventCapture);
+        }
         //Send Data
         httpSend.send(this, seventCapture, eventCapture.event_id);
     }
