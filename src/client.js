@@ -113,7 +113,7 @@ function Tracker() {
         this.context.environment = extra.environment || this.context.environment;
         this.context.loggerName = extra.loggerName || this.context.logger;
         this.context.username = extra.username || this.context.username;
-        this.context.timestamp = new Date().toLocaleTimeString();
+        this.context.timestamp = new Date().toLocaleString();
 
 
         eventCapture.event_id = eventId;
