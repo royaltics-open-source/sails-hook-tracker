@@ -104,7 +104,7 @@ function Tracker() {
         var domainContext = {};
         eventCapture.user = this._globalContext.user || domainContext.user || eventCapture.user;
         eventCapture.tags = this._globalContext.tags || domainContext.tags || eventCapture.tags;
-        eventCapture.extra = this._globalContext.extra || domainContext.extra || eventCapture.extra;
+        eventCapture.extra = this._globalContext.extra || domainContext.extra || eventCapture.extra || {};
         eventCapture.breadcrumbs = {
             values: domainContext.breadcrumbs || this._globalContext.breadcrumbs || []
         };
@@ -163,7 +163,7 @@ function Tracker() {
         httpSend.send(this, seventCapture, eventCapture.event_id);
     }
 
-    this.generateEventId = generateEventId => {
+    this.generateEventId = () => {
         return uuid().replace(/-/g, '');
     }
 
