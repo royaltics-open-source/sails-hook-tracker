@@ -1,9 +1,9 @@
 {
   "name": "sails-hook-tracker",
-  "version": "1.0.8",
+  "version": "1.0.17",
   "description": "Sails hook Tracker for Sentry (Capture Errors)",
   "main": "index.js",
-  "author": "Royaltics Solutions <",
+  "author": "Royaltics Solutions",
   "license": "ISC",
   "homepage": "https://github.com/royaltics-open-source/sails-hook-tracker",
   "repository": {

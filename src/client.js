@@ -31,16 +31,7 @@ function Tracker() {
         this.options = options || {};
         this.debug = options.debug || false;
         this.dsn = utils.parseDSN(dsn);
-        this.name = options.name || require('os').hostname();
-        this.root = options.root || process.cwd();
-        this.headers = options.headers || {};
-        this.release = options.release || '';
-        this.environment = options.environment || '';
-        this.captureUnhandledRejections = options.captureUnhandledRejections;
-        this.loggerName = options.logger || '';
-        this.dataCallback = options.dataCallback;
-        this.shouldSendCallback = options.shouldSendCallback;
-        this.parseUser = options.parseUser;
+
 
         if (!this.dsn) {
             utils.consoleAlert('no DSN provided, error reporting disabled');
@@ -50,13 +41,27 @@ function Tracker() {
         // enabled if a dsn is set
         this._enabled = !!this.dsn;
 
-        var globalContext = this._globalContext = {};
-        if (options.tags) {
-            globalContext.tags = options.tags;
-        }
-        if (options.extra) {
-            globalContext.extra = options.extra;
-        }
+        var context = {}
+        context.server_name = options.server_name || require('os').hostname() || '';
+        context.root = options.root || process.cwd();
+        context.headers = options.headers;
+        context.release = options.release || '';
+        context.environment = options.environment || '';
+        context.logger = options.loggerName || '';
+        context.username = options.username || '';
+        context.platform = options.platform || 'node';
+        context.project = options.project_id;
+        context.node = process.version;
+
+        this.breadcrumbs = options.breadcrumbs || {};
+        this.context = context;
+        this.extra = options.extra || {};
+        this.tags = options.tags || {};
+        this.dataCallback = options.dataCallback;
+        this.shouldSendCallback = options.shouldSendCallback;
+        this.captureUnhandledRejections = options.captureUnhandledRejections;
+
+
 
         this.on('error', (err) => {
             utils.consoleAlert(err?.message, err?.response);
@@ -78,11 +83,6 @@ function Tracker() {
             registerRejectionHandler(this, cb);
         }
 
-        for (var key in this.autoBreadcrumbs) {
-            if (this.autoBreadcrumbs.hasOwnProperty(key)) {
-                this.autoBreadcrumbs[key] && autoBreadcrumbs.instrument(key, this);
-            }
-        }
 
         if (this.debug) {
             utils.consoleAlert('Instalado DSN: ' + this.dsn.hostname + this.dsn.path + " port: " + this.dsn.port + " protocol: " + this.dsn.protocol);
@@ -93,6 +93,7 @@ function Tracker() {
         return this;
     }
 
+
     this.process = (eventId, eventCapture, cb) => {
         // prod codepaths shouldn't hit this branch, for testing
         if (typeof eventId === 'object') {
@@ -101,32 +102,32 @@ function Tracker() {
             eventId = this.generateEventId();
         }
 
-        var domainContext = {};
-        eventCapture.user = this._globalContext.user || domainContext.user || eventCapture.user;
-        eventCapture.tags = this._globalContext.tags || domainContext.tags || eventCapture.tags;
-        eventCapture.extra = this._globalContext.extra || domainContext.extra || eventCapture.extra || {};
-        eventCapture.breadcrumbs = {
-            values: domainContext.breadcrumbs || this._globalContext.breadcrumbs || []
+        var extra = eventCapture.extra || {};
+
+        //GENERATE CONTEXT
+
+        this.context.server_name = extra.server_name || this.context.server_name;
+        this.context.root = extra.root || this.context.root;
+        this.context.headers = extra.headers || this.context.headers;
+        this.context.release = extra.release || this.context.release;
+        this.context.environment = extra.environment || this.context.environment;
+        this.context.loggerName = extra.loggerName || this.context.logger;
+        this.context.username = extra.username || this.context.username;
+        this.context.timestamp = new Date().toLocaleTimeString();
+
+
+        eventCapture.event_id = eventId;
+        eventCapture.context = this.context;
+        eventCapture.tags = eventCapture.tags || this.tags;
+        eventCapture.extra = extra;
+
+        //eventCapture.exeption from parseError;
+
+        eventCapture.aditional = {
+            modules: utils.getModules() || [],
+            breadcrumbs: this.breadcrumbs || []
         };
 
-        eventCapture.modules = utils.getModules();
-        eventCapture.server_name = eventCapture.server_name || this.name;
-
-        if (typeof process.version !== 'undefined') {
-            eventCapture.extra.node = process.version;
-        }
-
-        eventCapture.environment = eventCapture.environment || this.environment;
-        eventCapture.logger = eventCapture.logger || this.loggerName;
-        eventCapture.event_id = eventId;
-        eventCapture.timestamp = new Date().toISOString().split('.')[0];
-        eventCapture.project = this.options.project_id;
-        eventCapture.platform = 'node';
-
-        // Only include release information if it is set
-        if (this.release) {
-            eventCapture.release = this.release;
-        }
 
         if (this.dataCallback) {
             eventCapture = this.dataCallback(eventCapture);
@@ -135,7 +136,6 @@ function Tracker() {
         var shouldSend = true;
         if (!this._enabled) shouldSend = false;
         if (this.shouldSendCallback && !this.shouldSendCallback(eventCapture)) shouldSend = false;
-        if (Math.random() >= this.sampleRate) shouldSend = false;
 
         if (shouldSend) {
             this.send(eventCapture, cb);
@@ -199,7 +199,11 @@ function Tracker() {
         var eventId = this.generateEventId();
 
         parsers.parseError(err, eventCapture, function (kw) {
-            self.process(eventId, kw, cb);
+            try {
+                self.process(eventId, kw, cb);
+            } catch (internal_exception) {
+                return utils.consoleAlert('internalException:', internal_exception);
+            }
         });
 
         return eventId;
@@ -235,7 +239,8 @@ const registerExceptionHandler = (client, cb) => {
         }
 
         var eventId = client.captureException(err);
-        return utils.consoleAlert('uncaughtException: ' + eventId);
+
+        return utils.consoleAlert('uncaughtException: ' + eventId, err.message);
     });
 }
 

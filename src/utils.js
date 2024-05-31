@@ -57,7 +57,7 @@ module.exports.parseDSN = function parseDSN(dsn) {
     return {
       hostname: parsedUrl.hostname,
       path: parsedUrl.pathname + parsedUrl.search,
-      port: portDefault, //parsedUrl.port || 
+      port: parsedUrl.port && parsedUrl.port !== '' ? parsedUrl.port : portDefault,
       protocol: parsedUrl.protocol,
       protocolIndex: parsedUrl.protocol === 'http:' ? 0 : 1,
     };

@@ -44,7 +44,7 @@ module.exports = function Tracker(sails) {
 
       // handles Bluebird's promises unhandled rejections
       process.on('unhandledRejection', function (reason) {
-        console.error('Unhandled rejection:', reason);
+        if(settings.options?.debug) console.error('Unhandled rejection:', reason);
         tracker.captureException(reason);
       });
 
