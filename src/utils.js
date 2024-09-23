@@ -13,14 +13,14 @@ module.exports.disableConsoleAlerts = function disableConsoleAlerts() {
 
 module.exports.consoleAlert = function consoleAlert(msg, data = '') {
   if (consoleAlerts) {
-    sails.log.debug("sails-hooks-tracker@" + version + ': ' + msg, data);
+    console.log("sails-hooks-tracker@" + version + ': ' + msg, data);
   }
 };
 
 module.exports.consoleAlertOnce = function consoleAlertOnce(msg) {
   if (consoleAlerts && !(msg in consoleAlerts)) {
     consoleAlerts[msg] = true;
-    sails.log.debug("sails-hooks-tracker@" + version + ': ' + msg);
+    console.log("sails-hooks-tracker@" + version + ': ' + msg);
   }
 };
 
