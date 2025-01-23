@@ -1,6 +1,6 @@
 {
   "name": "sails-hook-tracker",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Sails hook Tracker for Sentry (Capture Errors)",
   "main": "index.js",
   "author": "Royaltics Solutions",
