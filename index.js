@@ -33,10 +33,9 @@ module.exports = function Tracker(sails) {
       }
 
       if (!settings.dsn) {
-        sails.log.error('DSN for Tracker is required.');
+        sails.log.error('DSN for Tracker is required in config/tracker.js module '+this.configKey);
         return cb();
       }
-
 
       var tracker = require("./src/client");
       tracker.config(settings.dsn, settings.options).install();
@@ -45,7 +44,7 @@ module.exports = function Tracker(sails) {
 
       // handles Bluebird's promises unhandled rejections
       process.on('unhandledRejection', function (reason) {
-        console.error('Unhandled rejection:', reason);
+        if(settings.options?.debug) console.error('Unhandled rejection:', reason);
         tracker.captureException(reason);
       });
 
